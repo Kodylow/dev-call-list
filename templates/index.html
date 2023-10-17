@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dev Call Generator</title>
+    <style>
+      /* Elegant Cypherpunk styling */
+      body {
+        background-color: #1a1a1a;
+        color: #a8a8a8;
+        font-family: "Courier New", monospace;
+        padding: 20px;
+      }
+      .container {
+        width: 600px;
+        margin: 0 auto;
+        background-color: #2a2a2a;
+        padding: 20px;
+        border-radius: 5px;
+      }
+      h1 {
+        color: #f8f8f8;
+        border-bottom: 1px solid #a8a8a8;
+        padding-bottom: 10px;
+      }
+      label {
+        color: #f8f8f8;
+      }
+      .loading {
+        display: none;
+        text-align: center;
+        color: #f8f8f8;
+      }
+      input,
+      button,
+      a {
+        background-color: #3a3a3a;
+        color: #f8f8f8;
+        border: 1px solid #a8a8a8;
+        margin-top: 10px;
+        padding: 5px;
+      }
+      a {
+        text-decoration: none;
+      }
+      a:hover {
+        color: #a8a8a8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Dev Call Generator</h1>
+      <form id="input-form" method="POST" onsubmit="showLoading()">
+        <label for="repo_link">Repo Link:</label><br />
+        <input type="text" id="repo_link" name="repo_link" required /><br />
+        <label for="days">Number of Days:</label><br />
+        <input
+          type="number"
+          id="days"
+          name="days"
+          min="1"
+          max="31"
+          required
+        /><br />
+        <input type="submit" value="Submit" />
+      </form>
+      <div class="loading" id="loading">
+        <p>Loading...</p>
+      </div>
+      <div id="result-buttons" style="display: none">
+        <button id="copy-button">Copy Markdown Content</button>
+        <a id="download-button" download="report.md">Download Markdown</a>
+      </div>
+    </div>
+    <script>
+      document
+        .querySelector("#input-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          document.getElementById("loading").style.display = "block";
+          document.getElementById("input-form").style.display = "none";
+          fetch("/", {
+            method: "POST",
+            body: new FormData(event.target),
+          })
+            .then((response) => response.text())
+            .then((markdown) => {
+              document.getElementById("loading").style.display = "none";
+              document.getElementById("result-buttons").style.display = "block";
+              document
+                .getElementById("copy-button")
+                .addEventListener("click", function () {
+                  navigator.clipboard.writeText(markdown);
+                });
+              document.getElementById("download-button").href =
+                "data:text/plain;charset=utf-8," + encodeURIComponent(markdown);
+            });
+        });
+    </script>
+  </body>
+</html>
